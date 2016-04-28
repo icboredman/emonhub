@@ -15,6 +15,9 @@ import json
 import threading
 import Queue
 
+import pycurl
+import cStringIO
+
 import emonhub_buffer as ehb
   
 """class EmonHubReporter
@@ -222,23 +225,27 @@ class EmonHubReporter(threading.Thread):
         """
 
         reply = ""
-        request = urllib2.Request(post_url, post_body)
-        try:
-            response = urllib2.urlopen(request, timeout=60)
-        except urllib2.HTTPError as e:
-            self._log.warning(self.name + " couldn't send to server, HTTPError: " +
+        response = cStringIO.StringIO()
+        c = pycurl.Curl()
+        c.setopt(c.URL, post_url)
+        c.setopt(c.WRITEFUNCTION, response.write)
+        c.setopt(c.POSTFIELDS, post_body)
+        c.setopt(c.SSL_VERIFYPEER, 0)
+        c.setopt(c.SSL_VERIFYHOST, 0)
+        c.setopt(c.SSLKEY, "/etc/apache2/ssl.ca/intermediate/certs/pycurl.nopwd.client.pem")
+        c.setopt(c.SSLCERT, "/etc/apache2/ssl.ca/intermediate/certs/pycurl.client.pem")
+
+       try:
+            c.perform()
+        except pycurl.error as e:
+            self._log.warning(self.name + " couldn't send to server, PyCurlError: " +
                               str(e.code))
-        except urllib2.URLError as e:
-            self._log.warning(self.name + " couldn't send to server, URLError: " +
-                              str(e.reason))
-        except httplib.HTTPException:
-            self._log.warning(self.name + " couldn't send to server, HTTPException")
         except Exception:
             import traceback
             self._log.warning(self.name + " couldn't send to server, Exception: " +
                               traceback.format_exc())
         else:
-            reply = response.read()
+            reply = response.getvalue()
         finally:
             return reply
 
