@@ -22,7 +22,9 @@ Changes in this fork
 * Added posting to EmonCMS over https. This also works with client side SSL certificate
 
 The https support was enabled by replacing urllib2 with pycurl calls, since, for some reason, I was unable to get results with urllib2.
+
 In order to properly configure pycurl, I used this procedure: 
+
     sudo apt-get install python-pycurl
     sudo apt-get install libcurl4-openssl-dev        (OpenSSL seems to have better SSL support than GnuTLS)
     curl-config --version
