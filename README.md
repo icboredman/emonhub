@@ -19,9 +19,9 @@ This software is part of OpenEnergyMonitor project.
 Changes in this fork
 ------------------
 * Increased number of nodes from 31 to 49
-* Added posting to EmonCMS over https. This also works with client side SSL certificate
+* Added posting to EmonCMS over HTTPS. This also works with client side SSL certificate
 
-The https support was enabled by replacing urllib2 with pycurl calls, since, for some reason, I was unable to get results with urllib2.
+The SSL support was enabled by replacing urllib2 with pycurl calls, since, for some reason, I was unable to get results with urllib2.
 
 In order to properly configure pycurl, I used this procedure: 
 
