@@ -33,4 +33,10 @@ In order to properly configure pycurl, I used this procedure:
     cd pycurl
     sudo python setup.py install 
 
+To use client side SSL certificates, two additional entries were added to emonhub.conf: sslcertfile and sslkeyfile
+
+Here's the procedure I used to generate certificate files that pyCurl understands:
+
+    openssl pkcs12 -in client.p12 -out pycurl.client.pem -clcerts
+    openssl rsa -in pycurl.client.pem -out pycurl.nopwd.client.pem
 

@@ -232,10 +232,10 @@ class EmonHubReporter(threading.Thread):
         c.setopt(c.POSTFIELDS, post_body)
         c.setopt(c.SSL_VERIFYPEER, 0)
         c.setopt(c.SSL_VERIFYHOST, 0)
-        c.setopt(c.SSLKEY, "/etc/apache2/ssl.ca/intermediate/certs/pycurl.nopwd.client.pem")
-        c.setopt(c.SSLCERT, "/etc/apache2/ssl.ca/intermediate/certs/pycurl.client.pem")
+        c.setopt(c.SSLCERT, self._settings['sslcertfile'])
+        c.setopt(c.SSLKEY,  self._settings['sslkeyfile'])
 
-       try:
+        try:
             c.perform()
         except pycurl.error as e:
             self._log.warning(self.name + " couldn't send to server, PyCurlError: " +
@@ -268,7 +268,7 @@ class EmonHubEmoncmsReporter(EmonHubReporter):
 
         # add or alter any default settings for this reporter
         self._defaults.update({'batchsize': 100})
-        self._cms_settings = {'apikey': "", 'url': 'http://emoncms.org'}
+        self._cms_settings = {'apikey': "", 'url': 'http://emoncms.org', 'sslcertfile': "", 'sslkeyfile': ""}
 
         # This line will stop the default values printing to logfile at start-up
         self._settings.update(self._defaults)
@@ -312,6 +312,14 @@ class EmonHubEmoncmsReporter(EmonHubReporter):
                 continue
             elif key == 'url' and setting[:4] == "http":
                 self._log.info("Setting " + self.name + " url: " + setting)
+                self._settings[key] = setting
+                continue
+            elif key == 'sslcertfile':
+                self._log.info("Setting " + self.name + " sslcertfile: " + setting)
+                self._settings[key] = setting
+                continue
+            elif key == 'sslkeyfile':
+                self._log.info("Setting " + self.name + " sslkeyfile: " + setting)
                 self._settings[key] = setting
                 continue
             else:
